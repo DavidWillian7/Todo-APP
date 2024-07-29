@@ -1,6 +1,16 @@
-from pydantic import BaseModel, Field
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+
+class Users(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key = True, index = True)
+    username = Column(String, unique = True)
+    email = Column(String, unique = True)
+    hashed_password = Column(String)
+    name = Column(String)
+    is_active = Column(Boolean, default = True)
+    role = Column(String)
 
 class Todos(Base):
     __tablename__ = "todos"
@@ -10,9 +20,4 @@ class Todos(Base):
     description = Column(String)
     priority = Column(Integer)
     complete = Column(Boolean, default = False)
-
-class TodosRequest(BaseModel):
-    title: str = Field(..., min_length = 3, max_length = 100,example = "Title of the todo")
-    description: str = Field(..., min_length = 3, max_length = 200, example = "Description of the todo")
-    priority: int = Field(..., ge = 1, le = 5, example = 1)
-    complete: bool = Field(..., example = False)
+    owner_id = Column(Integer, ForeignKey("users.id"))
